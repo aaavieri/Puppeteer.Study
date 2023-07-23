@@ -1,5 +1,6 @@
 import { Browser, Page } from 'puppeteer';
-import fs from 'fs';
+import { promises as fs } from 'fs';
+import { sleep } from './util';
 
 export class Downloader {
 
@@ -17,16 +18,17 @@ export class Downloader {
             this.pageFile = await this.browser.newPage()
         }
         const instance = this
-        fs.mkdirSync(saveDir, {recursive: true})
-        let index = 0
+        await fs.mkdir(saveDir, { recursive: true })
         await this.pageFile.exposeFunction('savefile', async (url: string, data: Uint8Array, byteLength: number) => {
             const buf = instance.toBuffer(data, byteLength);
             let filePath = `${saveDir}/${index}-${instance.getFileName(url)}`
             if (!needIndex) {
                 filePath = `${saveDir}/${instance.getFileName(url)}`
             }
-            await fs.writeFileSync(filePath, buf);
+            await fs.writeFile(filePath, buf)
         });
+
+        let index = 0
 
         for (let i = 0; i < urls.length; i++) {
             index = i
@@ -47,6 +49,11 @@ export class Downloader {
                             reader.onload = async function (e) {
                                 const fdata = new Uint8Array(reader.result as ArrayBuffer);
                                 //page.exposeFunction定义的函数
+                                console.log((window as any).savefile)
+                                console.log(window.location.href)
+                                console.log(fdata)
+                                console.log(fdata.length)
+                                debugger
                                 await (window as any).savefile(window.location.href, fdata, fdata.length);
                                 resolve()
                             }
@@ -58,39 +65,31 @@ export class Downloader {
                 return promise
             });
             saveFilePaths.push(`${saveDir}/${instance.getFileName(url)}`)
-            await this.sleep(1000)
+            await sleep(1000)
         }
+        await this.pageFile.removeExposedFunction('savefile')
         return saveFilePaths
     }
 
     public async complete() {
         if (this.pageFile) {
             await this.pageFile.close()
+            this.pageFile = undefined
         }
-    }
-
-    private async sleep(mills: number): Promise<void> {
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                resolve()
-            }, mills)
-        })
     }
 
     private toBuffer(ab: Uint8Array, byteLength: number): Uint8Array {
         const buf = new Uint8Array(byteLength);
         for (let i = 0; i < buf.length; ++i) {
-          buf[i] = ab[i];
+            buf[i] = ab[i];
         }
-        console.log(buf)
-        console.log(typeof(buf))
         return buf;
-      }
-      
-      private getFileName(url: string): string {
+    }
+
+    private getFileName(url: string): string {
         const urls = url.split('/')
         const fileNameWithParam = urls[urls.length - 1]
         const fileName = fileNameWithParam.split('?')[0]
         return fileName
-      }
+    }
 }
