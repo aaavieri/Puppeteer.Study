@@ -11,6 +11,22 @@
         "program": "${workspaceFolder}/ex2.ts",
         "preLaunchTask": "tsc: build - tsconfig.json",
         "outFiles": ["${workspaceFolder}/out/**/*.js"]
+      },
+      {
+        "type": "node",
+        "request": "launch",
+        "name": "ex3",
+        "program": "${workspaceFolder}/ex3.ts",
+        "preLaunchTask": "tsc: build - tsconfig.json",
+        "outFiles": ["${workspaceFolder}/out/**/*.js"]
+      },
+      {
+        "type": "node",
+        "request": "launch",
+        "name": "ex4",
+        "program": "${workspaceFolder}/ex4.ts",
+        "preLaunchTask": "tsc: build - tsconfig.json",
+        "outFiles": ["${workspaceFolder}/out/**/*.js"]
       }
     ]
 }
