@@ -27,6 +27,14 @@
         "program": "${workspaceFolder}/ex4.ts",
         "preLaunchTask": "tsc: build - tsconfig.json",
         "outFiles": ["${workspaceFolder}/out/**/*.js"]
+      },
+      {
+        "type": "node",
+        "request": "launch",
+        "name": "ex5",
+        "program": "${workspaceFolder}/ex5.ts",
+        "preLaunchTask": "tsc: build - tsconfig.json",
+        "outFiles": ["${workspaceFolder}/out/**/*.js"]
       }
     ]
 }

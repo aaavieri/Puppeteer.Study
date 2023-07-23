@@ -2,6 +2,11 @@ import { Browser, Page } from 'puppeteer';
 import { promises as fs } from 'fs';
 import { sleep } from './util';
 
+export interface FileInfo {
+    fileName: string
+    filePath: string
+}
+
 export class Downloader {
 
     private browser: Browser
@@ -12,8 +17,8 @@ export class Downloader {
         this.browser = browser
     }
 
-    public async downloadFiles(urls: Array<string>, saveDir: string = './', needIndex: boolean = true): Promise<Array<string>> {
-        const saveFilePaths: Array<string> = []
+    public async downloadFiles(urls: Array<string>, saveDir: string = './', needIndex: boolean = true): Promise<Array<FileInfo>> {
+        const saveFilePaths: Array<FileInfo> = []
         if (this.pageFile == undefined) {
             this.pageFile = await this.browser.newPage()
         }
@@ -64,7 +69,11 @@ export class Downloader {
                 })
                 return promise
             });
-            saveFilePaths.push(`${saveDir}/${instance.getFileName(url)}`)
+            const fileName = instance.getFileName(url)
+            saveFilePaths.push({
+                filePath: `${saveDir}/${fileName}`,
+                fileName
+            })
             await sleep(1000)
         }
         await this.pageFile.removeExposedFunction('savefile')

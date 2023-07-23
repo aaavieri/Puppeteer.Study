@@ -5,3 +5,7 @@ export function sleep(mills: number): Promise<void> {
         }, mills)
     })
 }
+
+export function lpad(str: string, padChar: string, length: number): string {
+    return new Array(length - str.length).fill(padChar).join('') + str
+}
